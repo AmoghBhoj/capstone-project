@@ -221,3 +221,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+CLAUDE.md
+
+# Capstone: local Qdrant data and generated embeddings (large, rebuildable)
+qdrant_storage/
+artifacts/

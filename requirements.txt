@@ -1,0 +1,10 @@
+# Exact versions so the results are reproducible on a fresh clone.
+qdrant-client==1.20.0         # Python client for the Qdrant server in docker-compose.yml
+sentence-transformers==6.3.0  # loads all-MiniLM-L6-v2 and turns text into vectors
+scikit-learn==1.9.1           # 20 Newsgroups dataset + KMeans for the IVF index
+numpy==2.5.5                  # vector maths and saving vectors as .npy files
+tabulate==0.10.0              # prints readable comparison tables in the terminal
+
+# sentence-transformers pulls in torch; pin it too because it is the
+# largest dependency and the most likely to change behaviour between versions.
+torch==2.15.0
