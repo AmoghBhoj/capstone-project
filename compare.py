@@ -205,6 +205,11 @@ def run_hnsw(client):
                + ["avg overlap", "avg latency (ms)"])
     print("\nPart 3: overlap@5 with exact search (1.0 = all of the true top 5 found)")
     print(tabulate(rows, headers=headers, floatfmt=".2f"))
+
+    RESULTS_DIR.mkdir(exist_ok=True)
+    output_file = RESULTS_DIR / "hnsw.json"
+    output_file.write_text(json.dumps(results, indent=2))
+    print(f"Saved {output_file.name}: {len(results)} configurations x {len(query_vectors)} queries")
     return results
 
 
