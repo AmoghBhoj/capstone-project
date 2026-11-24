@@ -20,6 +20,7 @@ QUERIES_NORM_FILE = ARTIFACTS_DIR / "queries_norm.npy"   # 5 queries, normalised
 
 # --- Embedding model -----------------------------------------------------
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+VECTOR_SIZE = 384      # how many numbers (dimensions) each vector has
 
 # --- Dataset -------------------------------------------------------------
 SEED = 42              # fixed seed, so the same 6000 posts are picked every run
@@ -28,3 +29,8 @@ MIN_DOC_CHARS = 50     # posts shorter than this after cleaning are dropped
 
 # --- Qdrant --------------------------------------------------------------
 QDRANT_URL = "http://localhost:6333"   # matches the port in docker-compose.yml
+
+# Part 2: same raw vectors, three distance methods
+COLLECTION_COSINE = "news_cosine"
+COLLECTION_EUCLID = "news_euclid"
+COLLECTION_DOT = "news_dot"
