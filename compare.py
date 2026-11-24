@@ -4,6 +4,7 @@ Run `python embed.py` and `python qdrant_setup.py` first.
 """
 
 import json
+import time
 
 import numpy as np
 from qdrant_client import QdrantClient, models
@@ -16,10 +17,12 @@ from config import (
     COLLECTION_HNSW_DEFAULT,
     COLLECTION_HNSW_WEAK,
     EF_VALUES,
+    LATENCY_REPEATS,
     QDRANT_URL,
     QUERIES_RAW_FILE,
     RESULTS_DIR,
     TOP_K,
+    WARMUP_RUNS,
 )
 from embed import load_queries
 
@@ -144,32 +147,65 @@ def overlap_at_k(found_ids, true_ids):
     return len(both) / TOP_K
 
 
+def median_latency_ms(client, collection, query_vector, search_params):
+    """Time one search properly: warm up, repeat, and keep the median (in ms)."""
+    # Warm-up: the first searches pay one-time costs, so don't count them.
+    for _ in range(WARMUP_RUNS):
+        search_ids(client, collection, query_vector, search_params)
+
+    timings = []
+    for _ in range(LATENCY_REPEATS):
+        start = time.perf_counter()                 # precise stopwatch: start
+        search_ids(client, collection, query_vector, search_params)
+        seconds = time.perf_counter() - start       # stop
+        timings.append(seconds * 1000)              # seconds -> milliseconds
+    # Median = the middle value, so one slow outlier doesn't distort it.
+    return float(np.median(timings))
+
+
 def run_hnsw(client):
-    """Part 3: how often does HNSW find the same top 5 as exact search?"""
+    """Part 3: exact search vs HNSW (default and weak map) at several ef values."""
     query_vectors = np.load(QUERIES_RAW_FILE)
 
-    # Ground truth: exact (brute-force) search, which checks all 6000 posts.
-    exact_ids = []
-    for query_vector in query_vectors:
-        ids = search_ids(client, COLLECTION_HNSW_DEFAULT, query_vector,
-                         models.SearchParams(exact=True))
-        exact_ids.append(ids)
-
-    # Every collection x every ef: search all queries, compare with the truth.
-    rows = []
+    # Every configuration to test: (name, collection, search settings).
+    # "exact" checks all 6000 posts and is our ground truth.
+    configs = [("exact", COLLECTION_HNSW_DEFAULT, models.SearchParams(exact=True))]
     for label, collection in HNSW_COLLECTIONS.items():
         for ef in EF_VALUES:
-            overlaps = []
-            for i, query_vector in enumerate(query_vectors):
-                ids = search_ids(client, collection, query_vector,
-                                 models.SearchParams(hnsw_ef=ef))
-                overlaps.append(overlap_at_k(ids, exact_ids[i]))
-            average = sum(overlaps) / len(overlaps)
-            rows.append([f"{label}_ef{ef}"] + overlaps + [average])
+            configs.append((f"{label}_ef{ef}", collection, models.SearchParams(hnsw_ef=ef)))
 
-    headers = ["config"] + [f"q{i + 1}" for i in range(len(query_vectors))] + ["avg"]
-    print("\nPart 3: overlap@5 with exact search (1.0 = found all of the true top 5)")
+    # Ground truth first: the exact top-5 ids for each query.
+    exact_ids = []
+    for query_vector in query_vectors:
+        exact_ids.append(search_ids(client, COLLECTION_HNSW_DEFAULT, query_vector,
+                                    models.SearchParams(exact=True)))
+
+    results = {}
+    for name, collection, search_params in configs:
+        ids_per_query = []
+        overlaps = []
+        latencies = []
+        for i, query_vector in enumerate(query_vectors):
+            ids = search_ids(client, collection, query_vector, search_params)
+            ids_per_query.append(ids)
+            overlaps.append(overlap_at_k(ids, exact_ids[i]))
+            latencies.append(median_latency_ms(client, collection, query_vector, search_params))
+        results[name] = {
+            "ids": ids_per_query,
+            "overlap_at_5": overlaps,
+            "latency_ms": [round(x, 3) for x in latencies],
+            "avg_overlap": sum(overlaps) / len(overlaps),
+            "avg_latency_ms": round(sum(latencies) / len(latencies), 3),
+        }
+
+    rows = []
+    for name, r in results.items():
+        rows.append([name] + r["overlap_at_5"] + [r["avg_overlap"], r["avg_latency_ms"]])
+    headers = (["config"] + [f"q{i + 1}" for i in range(len(query_vectors))]
+               + ["avg overlap", "avg latency (ms)"])
+    print("\nPart 3: overlap@5 with exact search (1.0 = all of the true top 5 found)")
     print(tabulate(rows, headers=headers, floatfmt=".2f"))
+    return results
 
 
 def main():
