@@ -6,13 +6,16 @@ Run `python embed.py` and `python qdrant_setup.py` first.
 import json
 
 import numpy as np
-from qdrant_client import QdrantClient
+from qdrant_client import QdrantClient, models
 from tabulate import tabulate
 
 from config import (
     COLLECTION_COSINE,
     COLLECTION_DOT,
     COLLECTION_EUCLID,
+    COLLECTION_HNSW_DEFAULT,
+    COLLECTION_HNSW_WEAK,
+    EF_VALUES,
     QDRANT_URL,
     QUERIES_RAW_FILE,
     RESULTS_DIR,
@@ -25,6 +28,12 @@ METRIC_COLLECTIONS = {
     "cosine": COLLECTION_COSINE,
     "euclidean": COLLECTION_EUCLID,
     "dot": COLLECTION_DOT,
+}
+
+# Part 3: label -> HNSW collection (both Cosine, different map quality).
+HNSW_COLLECTIONS = {
+    "default": COLLECTION_HNSW_DEFAULT,
+    "weak": COLLECTION_HNSW_WEAK,
 }
 
 
@@ -112,9 +121,61 @@ def run_distance_metrics(client):
     return all_results
 
 
+def search_ids(client, collection, query_vector, search_params):
+    """Return only the ids of the TOP_K results, best first."""
+    response = client.query_points(
+        collection_name=collection,
+        query=query_vector.tolist(),
+        limit=TOP_K,
+        search_params=search_params,   # exact search, or HNSW with a given ef
+    )
+    ids = []
+    for point in response.points:
+        ids.append(point.id)
+    return ids
+
+
+def overlap_at_k(found_ids, true_ids):
+    """Share of the true top-K that was also found: 5 of 5 -> 1.0, 3 of 5 -> 0.6.
+
+    Uses sets, so only WHICH posts were found matters, not their order.
+    """
+    both = set(found_ids) & set(true_ids)   # & = the ids that are in both
+    return len(both) / TOP_K
+
+
+def run_hnsw(client):
+    """Part 3: how often does HNSW find the same top 5 as exact search?"""
+    query_vectors = np.load(QUERIES_RAW_FILE)
+
+    # Ground truth: exact (brute-force) search, which checks all 6000 posts.
+    exact_ids = []
+    for query_vector in query_vectors:
+        ids = search_ids(client, COLLECTION_HNSW_DEFAULT, query_vector,
+                         models.SearchParams(exact=True))
+        exact_ids.append(ids)
+
+    # Every collection x every ef: search all queries, compare with the truth.
+    rows = []
+    for label, collection in HNSW_COLLECTIONS.items():
+        for ef in EF_VALUES:
+            overlaps = []
+            for i, query_vector in enumerate(query_vectors):
+                ids = search_ids(client, collection, query_vector,
+                                 models.SearchParams(hnsw_ef=ef))
+                overlaps.append(overlap_at_k(ids, exact_ids[i]))
+            average = sum(overlaps) / len(overlaps)
+            rows.append([f"{label}_ef{ef}"] + overlaps + [average])
+
+    headers = ["config"] + [f"q{i + 1}" for i in range(len(query_vectors))] + ["avg"]
+    print("\nPart 3: overlap@5 with exact search (1.0 = found all of the true top 5)")
+    print(tabulate(rows, headers=headers, floatfmt=".2f"))
+
+
 def main():
     client = QdrantClient(url=QDRANT_URL)
     run_distance_metrics(client)
+    run_hnsw(client)
 
 
 if __name__ == "__main__":
