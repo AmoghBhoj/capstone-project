@@ -1,0 +1,567 @@
+{
+  "any plans for new space exploration by a space agency": {
+    "cosine": [
+      {
+        "rank": 1,
+        "id": 4756,
+        "score": 0.5636,
+        "category": "sci.space",
+        "snippet": "The AIAA San Gabriel Valley Section is sponsoring the following lecture on Mars exploration at the Jet Propulsion Lab. A"
+      },
+      {
+        "rank": 2,
+        "id": 207,
+        "score": 0.5546,
+        "category": "sci.space",
+        "snippet": "Reply address: mark.prado@permanet.org > From: higgins@fnalf.fnal.gov (Bill Higgins-- Beam Jockey) > > In article <1993A"
+      },
+      {
+        "rank": 3,
+        "id": 1933,
+        "score": 0.5432,
+        "category": "sci.space",
+        "snippet": "I have to agree with Ward. The problem with your approach is they add up what you can reasonably claim as 'spin-offs', a"
+      },
+      {
+        "rank": 4,
+        "id": 624,
+        "score": 0.5324,
+        "category": "sci.space",
+        "snippet": "I know it's only wishful thinking, with our current President, but this is from last fall: \"Is there life on Mars? Maybe"
+      },
+      {
+        "rank": 5,
+        "id": 2172,
+        "score": 0.5183,
+        "category": "sci.space",
+        "snippet": "Are you volunteering? :) Will NASA have \"available landing sites\" in the Russian Republic, now that they are Our Friends"
+      }
+    ],
+    "euclidean": [
+      {
+        "rank": 1,
+        "id": 1933,
+        "score": 4.9379,
+        "category": "sci.space",
+        "snippet": "I have to agree with Ward. The problem with your approach is they add up what you can reasonably claim as 'spin-offs', a"
+      },
+      {
+        "rank": 2,
+        "id": 5116,
+        "score": 4.9881,
+        "category": "sci.space",
+        "snippet": "We've been progressing towards that goal for 30 years now. We precede any orbiting mission with flyby missions. Of cours"
+      },
+      {
+        "rank": 3,
+        "id": 4756,
+        "score": 5.0345,
+        "category": "sci.space",
+        "snippet": "The AIAA San Gabriel Valley Section is sponsoring the following lecture on Mars exploration at the Jet Propulsion Lab. A"
+      },
+      {
+        "rank": 4,
+        "id": 2172,
+        "score": 5.0348,
+        "category": "sci.space",
+        "snippet": "Are you volunteering? :) Will NASA have \"available landing sites\" in the Russian Republic, now that they are Our Friends"
+      },
+      {
+        "rank": 5,
+        "id": 207,
+        "score": 5.0458,
+        "category": "sci.space",
+        "snippet": "Reply address: mark.prado@permanet.org > From: higgins@fnalf.fnal.gov (Bill Higgins-- Beam Jockey) > > In article <1993A"
+      }
+    ],
+    "dot": [
+      {
+        "rank": 1,
+        "id": 2172,
+        "score": 12.1467,
+        "category": "sci.space",
+        "snippet": "Are you volunteering? :) Will NASA have \"available landing sites\" in the Russian Republic, now that they are Our Friends"
+      },
+      {
+        "rank": 2,
+        "id": 5480,
+        "score": 11.1098,
+        "category": "sci.space",
+        "snippet": "From the \"JPL Universe\" April 23, 1993 VLBI project meets with international space agencies"
+      },
+      {
+        "rank": 3,
+        "id": 5105,
+        "score": 8.5522,
+        "category": "rec.sport.baseball",
+        "snippet": "Preliminary negotiations started already, I believe. Though the word is that they are going slooooooooooooooooooooooowly"
+      },
+      {
+        "rank": 4,
+        "id": 5116,
+        "score": 7.4779,
+        "category": "sci.space",
+        "snippet": "We've been progressing towards that goal for 30 years now. We precede any orbiting mission with flyby missions. Of cours"
+      },
+      {
+        "rank": 5,
+        "id": 4548,
+        "score": 7.444,
+        "category": "sci.space",
+        "snippet": "Not to mention how those those liberal presidents, Nixon, Ford, Reagan, Bush. did nothing to support true commercial spa"
+      }
+    ]
+  },
+  "how far can I expand the RAM in my PC": {
+    "cosine": [
+      {
+        "rank": 1,
+        "id": 5891,
+        "score": 0.5303,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "I was just reading in PC Magazine that the peripherals in a PC with an ISA bus can only access 16MB of memory. Also, tha"
+      },
+      {
+        "rank": 2,
+        "id": 4109,
+        "score": 0.5227,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "Hi folks, what exactly is the maximum memory I can put in a Quadra 700. My manual says 20MB (with 4 x 4MB SIMMs), but Ma"
+      },
+      {
+        "rank": 3,
+        "id": 1992,
+        "score": 0.513,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "With a little luck, I could own a C650 sometime in the near future, and so I was just wondering if someone could clear t"
+      },
+      {
+        "rank": 4,
+        "id": 4438,
+        "score": 0.4857,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "This may be the dumbest question of the year, but is there a way to 'piggyback' or expand a 6-slot motherboard (all 16-b"
+      },
+      {
+        "rank": 5,
+        "id": 2732,
+        "score": 0.4841,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "Could some kind soul please email ma a response since i don't have much time to read this group. Question: I have a 170 "
+      }
+    ],
+    "euclidean": [
+      {
+        "rank": 1,
+        "id": 4109,
+        "score": 5.6516,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "Hi folks, what exactly is the maximum memory I can put in a Quadra 700. My manual says 20MB (with 4 x 4MB SIMMs), but Ma"
+      },
+      {
+        "rank": 2,
+        "id": 5891,
+        "score": 5.7166,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "I was just reading in PC Magazine that the peripherals in a PC with an ISA bus can only access 16MB of memory. Also, tha"
+      },
+      {
+        "rank": 3,
+        "id": 1992,
+        "score": 5.7576,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "With a little luck, I could own a C650 sometime in the near future, and so I was just wondering if someone could clear t"
+      },
+      {
+        "rank": 4,
+        "id": 2545,
+        "score": 5.8343,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "I received a Kaypro 286i computer (DOS) without a manual that describes the jumpers on the motherboard. It came with 640"
+      },
+      {
+        "rank": 5,
+        "id": 4438,
+        "score": 5.8375,
+        "category": "comp.sys.ibm.pc.hardware",
+        "snippet": "This may be the dumbest question of the year, but is there a way to 'piggyback' or expand a 6-slot motherboard (all 16-b"
+      }
+    ],
+    "dot": [
+      {
+        "rank": 1,
+        "id": 5149,
+        "score": 11.8439,
+        "category": "misc.forsale",
+        "snippet": "C&T chip set 286-12 mother board C&T BIOS with 2 meg RAM (80ns). Reply with reasonable offer if you are interested... Th"
+      },
+      {
+        "rank": 2,
+        "id": 2383,
+        "score": 10.9446,
+        "category": "misc.forsale",
+        "snippet": "I have an Intel Above Board (16 bit) with 2 megs of ram that I would like to sell ASAP. Please email me offers if intere"
+      },
+      {
+        "rank": 3,
+        "id": 1791,
+        "score": 9.637,
+        "category": "comp.windows.x",
+        "snippet": "DEC does this only for their PX and PXG servers, known as 3D accelerators. This boards have local offscreen memory which"
+      },
+      {
+        "rank": 4,
+        "id": 3662,
+        "score": 9.2102,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "I want to go from 512K to 1M VRAM on my Quadra 800. How many 512K SIMMS do I need to buy? Is the current 512K soldered o"
+      },
+      {
+        "rank": 5,
+        "id": 4109,
+        "score": 9.1916,
+        "category": "comp.sys.mac.hardware",
+        "snippet": "Hi folks, what exactly is the maximum memory I can put in a Quadra 700. My manual says 20MB (with 4 x 4MB SIMMs), but Ma"
+      }
+    ]
+  },
+  "the most powerful car engine with the highest top speed": {
+    "cosine": [
+      {
+        "rank": 1,
+        "id": 5590,
+        "score": 0.4494,
+        "category": "rec.autos",
+        "snippet": "My whole point was not to say that the cars *couldn't* go that fast, but that they *shouldn't* go that fast. A family se"
+      },
+      {
+        "rank": 2,
+        "id": 1576,
+        "score": 0.4352,
+        "category": "rec.autos",
+        "snippet": "Probably the most famous V16 is the one Cadillac made from about 1925 to 1935. They had to scale down then because the G"
+      },
+      {
+        "rank": 3,
+        "id": 3910,
+        "score": 0.428,
+        "category": "comp.graphics",
+        "snippet": "Of course, I do not agree. It does have more horsepower. Horsepower is not the only measurement for 'better'. It does no"
+      },
+      {
+        "rank": 4,
+        "id": 132,
+        "score": 0.4161,
+        "category": "rec.autos",
+        "snippet": "Not only the Sonett (correct spelling), but the 95 wagon and 96 sedan used a 1500 cc or 1700 cc V-4 from Ford of Germany"
+      },
+      {
+        "rank": 5,
+        "id": 2122,
+        "score": 0.4039,
+        "category": "rec.autos",
+        "snippet": "It has some of the most impressive performance figures around, and automotive magazines eat it up. One car to seriously "
+      }
+    ],
+    "euclidean": [
+      {
+        "rank": 1,
+        "id": 1576,
+        "score": 5.7866,
+        "category": "rec.autos",
+        "snippet": "Probably the most famous V16 is the one Cadillac made from about 1925 to 1935. They had to scale down then because the G"
+      },
+      {
+        "rank": 2,
+        "id": 3910,
+        "score": 5.8083,
+        "category": "comp.graphics",
+        "snippet": "Of course, I do not agree. It does have more horsepower. Horsepower is not the only measurement for 'better'. It does no"
+      },
+      {
+        "rank": 3,
+        "id": 132,
+        "score": 5.847,
+        "category": "rec.autos",
+        "snippet": "Not only the Sonett (correct spelling), but the 95 wagon and 96 sedan used a 1500 cc or 1700 cc V-4 from Ford of Germany"
+      },
+      {
+        "rank": 4,
+        "id": 5590,
+        "score": 5.8506,
+        "category": "rec.autos",
+        "snippet": "My whole point was not to say that the cars *couldn't* go that fast, but that they *shouldn't* go that fast. A family se"
+      },
+      {
+        "rank": 5,
+        "id": 2122,
+        "score": 5.8725,
+        "category": "rec.autos",
+        "snippet": "It has some of the most impressive performance figures around, and automotive magazines eat it up. One car to seriously "
+      }
+    ],
+    "dot": [
+      {
+        "rank": 1,
+        "id": 3079,
+        "score": 8.9003,
+        "category": "rec.autos",
+        "snippet": "Kidding, right? Corvette, several MBZ's and BMW's, Mustang GT, etc., etc. There's a lot of them. You from a European sit"
+      },
+      {
+        "rank": 2,
+        "id": 5560,
+        "score": 8.6817,
+        "category": "rec.autos",
+        "snippet": "[Useless road design, speed rate discussion deleted.]"
+      },
+      {
+        "rank": 3,
+        "id": 2779,
+        "score": 8.1425,
+        "category": "rec.autos",
+        "snippet": "This is very curious being that they are both built by Mercury in the very same factory. Steve"
+      },
+      {
+        "rank": 4,
+        "id": 1812,
+        "score": 8.0112,
+        "category": "rec.autos",
+        "snippet": "Hi everyone, I'm getting a car in the near future. I've narrow it down to 300ZX and SC300. Which might be a better choic"
+      },
+      {
+        "rank": 5,
+        "id": 210,
+        "score": 8.0081,
+        "category": "rec.autos",
+        "snippet": "What??? I heard there was a new engine slated for the mustang...something like 280hp (ok, it was from one of their other"
+      }
+    ]
+  },
+  "what is the story of Adam and Eve": {
+    "cosine": [
+      {
+        "rank": 1,
+        "id": 3495,
+        "score": 0.6472,
+        "category": "talk.religion.misc",
+        "snippet": "I give up. What's new about yet another interpretation of the odl Adam and Eve story? -- Michael"
+      },
+      {
+        "rank": 2,
+        "id": 259,
+        "score": 0.6406,
+        "category": "alt.atheism",
+        "snippet": ": Are you saying that their was a physical Adam and Eve, and that all : humans are direct decendents of only these two h"
+      },
+      {
+        "rank": 3,
+        "id": 5512,
+        "score": 0.4983,
+        "category": "soc.religion.christian",
+        "snippet": "[ Much deletion. He is trying to explain the Immaculate Conception and the Assumption of Mary.] If this is true than why"
+      },
+      {
+        "rank": 4,
+        "id": 3754,
+        "score": 0.3999,
+        "category": "talk.religion.misc",
+        "snippet": "That is because two creation stories is one of the worst examples of a difficulty with the Bible. \"were formed\" can also"
+      },
+      {
+        "rank": 5,
+        "id": 715,
+        "score": 0.3889,
+        "category": "alt.atheism",
+        "snippet": ": Are you saying that their was a physical Adam and Eve, and that all humans are direct decendents of only these two hum"
+      }
+    ],
+    "euclidean": [
+      {
+        "rank": 1,
+        "id": 3495,
+        "score": 4.6557,
+        "category": "talk.religion.misc",
+        "snippet": "I give up. What's new about yet another interpretation of the odl Adam and Eve story? -- Michael"
+      },
+      {
+        "rank": 2,
+        "id": 259,
+        "score": 4.9255,
+        "category": "alt.atheism",
+        "snippet": ": Are you saying that their was a physical Adam and Eve, and that all : humans are direct decendents of only these two h"
+      },
+      {
+        "rank": 3,
+        "id": 5512,
+        "score": 5.3958,
+        "category": "soc.religion.christian",
+        "snippet": "[ Much deletion. He is trying to explain the Immaculate Conception and the Assumption of Mary.] If this is true than why"
+      },
+      {
+        "rank": 4,
+        "id": 3754,
+        "score": 5.5958,
+        "category": "talk.religion.misc",
+        "snippet": "That is because two creation stories is one of the worst examples of a difficulty with the Bible. \"were formed\" can also"
+      },
+      {
+        "rank": 5,
+        "id": 715,
+        "score": 5.665,
+        "category": "alt.atheism",
+        "snippet": ": Are you saying that their was a physical Adam and Eve, and that all humans are direct decendents of only these two hum"
+      }
+    ],
+    "dot": [
+      {
+        "rank": 1,
+        "id": 3495,
+        "score": 17.0088,
+        "category": "talk.religion.misc",
+        "snippet": "I give up. What's new about yet another interpretation of the odl Adam and Eve story? -- Michael"
+      },
+      {
+        "rank": 2,
+        "id": 259,
+        "score": 9.1538,
+        "category": "alt.atheism",
+        "snippet": ": Are you saying that their was a physical Adam and Eve, and that all : humans are direct decendents of only these two h"
+      },
+      {
+        "rank": 3,
+        "id": 3754,
+        "score": 6.9597,
+        "category": "talk.religion.misc",
+        "snippet": "That is because two creation stories is one of the worst examples of a difficulty with the Bible. \"were formed\" can also"
+      },
+      {
+        "rank": 4,
+        "id": 1163,
+        "score": 5.9919,
+        "category": "talk.politics.mideast",
+        "snippet": "I guess Hasan finally revealed the source of his claim that Israel diverted water from Lebanon--his imagination."
+      },
+      {
+        "rank": 5,
+        "id": 3047,
+        "score": 5.891,
+        "category": "alt.atheism",
+        "snippet": "See, I told you there was an atheist mythology, thanks for proving my point."
+      }
+    ]
+  },
+  "a good dealer to buy a 600cc motorcycle": {
+    "cosine": [
+      {
+        "rank": 1,
+        "id": 2585,
+        "score": 0.6102,
+        "category": "rec.motorcycles",
+        "snippet": "Anyone, I am a serious motorcycle enthusiast without a motorcycle, and to put it bluntly, it sucks. I really would like "
+      },
+      {
+        "rank": 2,
+        "id": 4854,
+        "score": 0.5784,
+        "category": "rec.motorcycles",
+        "snippet": "For sale 1988 Kawasaki EX-500 with 6682 miles. Excellent condition. Kept in a garage. Asking $2200."
+      },
+      {
+        "rank": 3,
+        "id": 495,
+        "score": 0.5624,
+        "category": "rec.motorcycles",
+        "snippet": "What size dirtbikes did you ride? and for how long? You might be able to slip into a 500cc bike. Like I keep telling peo"
+      },
+      {
+        "rank": 4,
+        "id": 3633,
+        "score": 0.5514,
+        "category": "rec.motorcycles",
+        "snippet": "For Sale 1988 Honda CBR600 (Hurricane). I bought the bike at the end of last summer and although I love it, the bills ar"
+      },
+      {
+        "rank": 5,
+        "id": 80,
+        "score": 0.5323,
+        "category": "rec.motorcycles",
+        "snippet": "* FOR SALE * From Ann Arbor, Michigan 1988 Kawasaki EX-500 6682 miles Cherry Red Excellent condition Asking $2300"
+      }
+    ],
+    "euclidean": [
+      {
+        "rank": 1,
+        "id": 4854,
+        "score": 5.681,
+        "category": "rec.motorcycles",
+        "snippet": "For sale 1988 Kawasaki EX-500 with 6682 miles. Excellent condition. Kept in a garage. Asking $2200."
+      },
+      {
+        "rank": 2,
+        "id": 2585,
+        "score": 5.7492,
+        "category": "rec.motorcycles",
+        "snippet": "Anyone, I am a serious motorcycle enthusiast without a motorcycle, and to put it bluntly, it sucks. I really would like "
+      },
+      {
+        "rank": 3,
+        "id": 80,
+        "score": 5.8915,
+        "category": "rec.motorcycles",
+        "snippet": "* FOR SALE * From Ann Arbor, Michigan 1988 Kawasaki EX-500 6682 miles Cherry Red Excellent condition Asking $2300"
+      },
+      {
+        "rank": 4,
+        "id": 495,
+        "score": 5.9023,
+        "category": "rec.motorcycles",
+        "snippet": "What size dirtbikes did you ride? and for how long? You might be able to slip into a 500cc bike. Like I keep telling peo"
+      },
+      {
+        "rank": 5,
+        "id": 1520,
+        "score": 6.0259,
+        "category": "rec.motorcycles",
+        "snippet": "So. If I can scrounge up a good looking CX500 Turbo, will someone trade me an MHR Duc for it? =========================="
+      }
+    ],
+    "dot": [
+      {
+        "rank": 1,
+        "id": 4854,
+        "score": 17.0658,
+        "category": "rec.motorcycles",
+        "snippet": "For sale 1988 Kawasaki EX-500 with 6682 miles. Excellent condition. Kept in a garage. Asking $2200."
+      },
+      {
+        "rank": 2,
+        "id": 875,
+        "score": 16.0624,
+        "category": "rec.motorcycles",
+        "snippet": "I am looking at the honda shadow 11000 and the intruder 800 or 1400? what have you heard about these bikes?"
+      },
+      {
+        "rank": 3,
+        "id": 2777,
+        "score": 15.4092,
+        "category": "misc.forsale",
+        "snippet": "Nikkor 70-210 AF for immediate sale. Excellent condition."
+      },
+      {
+        "rank": 4,
+        "id": 5220,
+        "score": 14.2102,
+        "category": "rec.autos",
+        "snippet": "Are there any Honda groups out there? Especially ones that deal with Preludes?"
+      },
+      {
+        "rank": 5,
+        "id": 80,
+        "score": 13.6754,
+        "category": "rec.motorcycles",
+        "snippet": "* FOR SALE * From Ann Arbor, Michigan 1988 Kawasaki EX-500 6682 miles Cherry Red Excellent condition Asking $2300"
+      }
+    ]
+  }
+}

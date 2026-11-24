@@ -34,3 +34,6 @@ QDRANT_URL = "http://localhost:6333"   # matches the port in docker-compose.yml
 COLLECTION_COSINE = "news_cosine"
 COLLECTION_EUCLID = "news_euclid"
 COLLECTION_DOT = "news_dot"
+
+# --- Search --------------------------------------------------------------
+TOP_K = 5              # every comparison looks at the top-5 results
