@@ -75,3 +75,30 @@ Running it again skips the posts (about 30 seconds of work) and only redoes the
 5 queries. To redo everything: `python embed.py --force`.
 
 To preview the sample without embedding: `python data.py`.
+
+## Part 2: Distance metrics
+
+Needs Qdrant running (Part 0) and the files from Part 1.
+
+```bash
+python qdrant_setup.py   # creates the collections and uploads the 6000 posts (~5 s)
+python compare.py        # searches with the 5 queries and saves the results
+```
+
+`qdrant_setup.py` creates three collections holding the **same raw vectors** and payload
+(category + text). Only the distance metric differs:
+
+| Collection | Distance | Measures |
+| --- | --- | --- |
+| `news_cosine` | Cosine | angle only (higher = closer) |
+| `news_euclid` | Euclidean | straight-line distance (lower = closer) |
+| `news_dot` | Dot product | angle × length (higher = closer) |
+
+Running it again deletes and recreates these three collections, so it always starts clean.
+
+`compare.py` runs each query against all three collections, prints the top 5 side by
+side, flags queries where the **ranking order** differs, and saves everything to
+`results/distance_metrics.json`. The findings are written up in `comparison.md`.
+
+If you edit `queries.md`, run `python embed.py` again before `compare.py`, so the
+query vectors match the new text.
