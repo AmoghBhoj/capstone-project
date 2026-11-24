@@ -35,5 +35,17 @@ COLLECTION_COSINE = "news_cosine"
 COLLECTION_EUCLID = "news_euclid"
 COLLECTION_DOT = "news_dot"
 
+# Part 3: HNSW with default build settings vs deliberately weak ones (both Cosine)
+COLLECTION_HNSW_DEFAULT = "news_hnsw_default"
+COLLECTION_HNSW_WEAK = "news_hnsw_weak"
+WEAK_M = 4                 # friends per post (Qdrant default: 16)
+WEAK_EF_CONSTRUCT = 8      # candidates checked when picking friends (default: 100)
+
+# Qdrant splits a collection into segments (ours: 2 x ~3000 posts = ~4.5 MB each).
+# Two per-segment rules would quietly turn "HNSW search" into exact search for a
+# collection this small. Both defaults are 10000 KB (~10 MB); we lower both.
+INDEXING_THRESHOLD_KB = 100   # rule 1: only BUILD the HNSW map if a segment is bigger than this
+FULL_SCAN_THRESHOLD_KB = 10   # rule 2: only USE the map if a segment is bigger than this
+
 # --- Search --------------------------------------------------------------
 TOP_K = 5              # every comparison looks at the top-5 results
