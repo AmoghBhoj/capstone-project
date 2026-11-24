@@ -46,3 +46,32 @@ It should load and show **no collections** yet. They are created in Parts 2 and 
 To stop Qdrant: `docker compose down` (your data in `qdrant_storage/` is kept).
 
 <!-- TODO: add a screenshot of the empty dashboard here, e.g. docs/dashboard.png -->
+
+## Part 1: Dataset and embeddings
+
+Qdrant is not needed for this part. It only uses Python and files.
+
+```bash
+python embed.py
+```
+
+This one command:
+
+1. Loads the 20 Newsgroups posts (downloaded automatically on the first run),
+   removes headers, signatures and quoted replies, drops posts under 50 characters,
+   and picks 6000 at random with seed 42 (`data.py`).
+2. Turns each post and each query in `queries.md` into a 384-number vector with
+   `all-MiniLM-L6-v2` (the model is downloaded automatically on the first run).
+3. Saves everything to `artifacts/` (git-ignored):
+
+| File | Contents |
+| --- | --- |
+| `vectors_raw.npy` | 6000 post vectors, raw (lengths vary) |
+| `vectors_norm.npy` | 6000 post vectors, normalised (length 1) |
+| `metadata.json` | text and topic of each post (`id` = row number in the vector files) |
+| `queries_raw.npy` / `queries_norm.npy` | the 5 query vectors, raw and normalised |
+
+Running it again skips the posts (about 30 seconds of work) and only redoes the
+5 queries. To redo everything: `python embed.py --force`.
+
+To preview the sample without embedding: `python data.py`.
