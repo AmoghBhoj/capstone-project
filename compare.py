@@ -17,14 +17,19 @@ from config import (
     COLLECTION_HNSW_DEFAULT,
     COLLECTION_HNSW_WEAK,
     EF_VALUES,
+    IVF_N_CLUSTERS,
+    IVF_NPROBE_VALUES,
     LATENCY_REPEATS,
     QDRANT_URL,
+    QUERIES_NORM_FILE,
     QUERIES_RAW_FILE,
     RESULTS_DIR,
     TOP_K,
+    VECTORS_NORM_FILE,
     WARMUP_RUNS,
 )
 from embed import load_queries
+from ivf import build_ivf_index, search_ivf
 
 # Part 2: the label used in the results file -> the collection to search.
 METRIC_COLLECTIONS = {
@@ -163,6 +168,18 @@ def median_latency_ms(client, collection, query_vector, search_params):
     return float(np.median(timings))
 
 
+def exact_ids_per_query(client, query_vectors):
+    """Ground truth: the exact (brute-force) top-K ids for each query, from Qdrant.
+
+    Pass the RAW query vectors: the Cosine collection normalises them itself.
+    """
+    exact_ids = []
+    for query_vector in query_vectors:
+        exact_ids.append(search_ids(client, COLLECTION_HNSW_DEFAULT, query_vector,
+                                    models.SearchParams(exact=True)))
+    return exact_ids
+
+
 def run_hnsw(client):
     """Part 3: exact search vs HNSW (default and weak map) at several ef values."""
     query_vectors = np.load(QUERIES_RAW_FILE)
@@ -175,10 +192,7 @@ def run_hnsw(client):
             configs.append((f"{label}_ef{ef}", collection, models.SearchParams(hnsw_ef=ef)))
 
     # Ground truth first: the exact top-5 ids for each query.
-    exact_ids = []
-    for query_vector in query_vectors:
-        exact_ids.append(search_ids(client, COLLECTION_HNSW_DEFAULT, query_vector,
-                                    models.SearchParams(exact=True)))
+    exact_ids = exact_ids_per_query(client, query_vectors)
 
     results = {}
     for name, collection, search_params in configs:
@@ -213,10 +227,90 @@ def run_hnsw(client):
     return results
 
 
+def median_latency_ivf_ms(index, query_vector, nprobe):
+    """Same timing method as median_latency_ms, but for our in-process IVF search."""
+    for _ in range(WARMUP_RUNS):
+        search_ivf(index, query_vector, nprobe)
+
+    timings = []
+    for _ in range(LATENCY_REPEATS):
+        start = time.perf_counter()
+        search_ivf(index, query_vector, nprobe)
+        seconds = time.perf_counter() - start
+        timings.append(seconds * 1000)
+    return float(np.median(timings))
+
+
+def run_ivf(client):
+    """Part 4: our own IVF index at several nprobe values, vs exact search."""
+    # Same ground truth as Part 3: Qdrant exact search with the RAW query vectors.
+    exact_ids = exact_ids_per_query(client, np.load(QUERIES_RAW_FILE))
+
+    # IVF uses NORMALISED vectors (posts and queries), so dot product = cosine.
+    print(f"\nBuilding the IVF index (KMeans, {IVF_N_CLUSTERS} clusters)...")
+    index = build_ivf_index(np.load(VECTORS_NORM_FILE))
+    query_vectors = np.load(QUERIES_NORM_FILE)
+
+    results = {"k_clusters": IVF_N_CLUSTERS}
+    for nprobe in IVF_NPROBE_VALUES:
+        ids_per_query = []
+        scores_per_query = []
+        overlaps = []
+        missed_per_query = []
+        scanned_per_query = []
+        latencies = []
+        for i, query_vector in enumerate(query_vectors):
+            ids, scores, n_scanned = search_ivf(index, query_vector, nprobe)
+
+            # True top-5 posts that IVF did not find (they sit in skipped clusters).
+            missed = []
+            for post_id in exact_ids[i]:
+                if post_id not in ids:
+                    missed.append(post_id)
+
+            ids_per_query.append(ids)
+            scores_per_query.append([round(s, 4) for s in scores])
+            overlaps.append(overlap_at_k(ids, exact_ids[i]))
+            missed_per_query.append(missed)
+            scanned_per_query.append(n_scanned)
+            latencies.append(median_latency_ivf_ms(index, query_vector, nprobe))
+
+        results[f"ivf_nprobe{nprobe}"] = {
+            "ids": ids_per_query,
+            "scores": scores_per_query,
+            "overlap_at_5": overlaps,
+            "missed": missed_per_query,
+            "posts_scanned": scanned_per_query,
+            "latency_ms": [round(x, 3) for x in latencies],
+            "avg_overlap": sum(overlaps) / len(overlaps),
+            "avg_posts_scanned": sum(scanned_per_query) / len(scanned_per_query),
+            "avg_latency_ms": round(sum(latencies) / len(latencies), 3),
+        }
+
+    rows = []
+    for nprobe in IVF_NPROBE_VALUES:
+        r = results[f"ivf_nprobe{nprobe}"]
+        rows.append([f"ivf_nprobe{nprobe}"] + r["overlap_at_5"]
+                    + [r["avg_overlap"], r["avg_posts_scanned"], r["avg_latency_ms"]])
+    headers = (["config"] + [f"q{i + 1}" for i in range(len(query_vectors))]
+               + ["avg overlap", "avg posts scanned", "avg latency (ms)"])
+    print("\nPart 4: IVF overlap@5 with exact search (1.0 = all of the true top 5 found)")
+    print(tabulate(rows, headers=headers, floatfmt=".3f"))
+    print("Note: IVF latency is in-process numpy; Qdrant latency includes an HTTP round trip.")
+
+    RESULTS_DIR.mkdir(exist_ok=True)
+    output_file = RESULTS_DIR / "ivf.json"
+    output_file.write_text(json.dumps(results, indent=2))
+    print(f"Saved {output_file.name}: {len(IVF_NPROBE_VALUES)} configurations x "
+          f"{len(query_vectors)} queries")
+    return results
+
+
 def main():
     client = QdrantClient(url=QDRANT_URL)
     run_distance_metrics(client)
     run_hnsw(client)
+    run_ivf(client)
 
 
 if __name__ == "__main__":

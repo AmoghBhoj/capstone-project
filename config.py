@@ -53,6 +53,9 @@ EF_VALUES = [16, 64, 128]   # Part 3: HNSW search-time shortlist sizes to try
 
 # --- Part 4: our own IVF index -------------------------------------------
 IVF_N_CLUSTERS = 40    # "a few dozen" clusters: ~150 posts each on average
+# How many closest clusters to search. The brief asks for 1 and 8; searching
+# all 40 is a sanity check: it scores every post, so it must equal exact search.
+IVF_NPROBE_VALUES = [1, 8, IVF_N_CLUSTERS]
 
 # --- Latency measurement -------------------------------------------------
 WARMUP_RUNS = 2        # searches run first and NOT timed (connection setup, caches)
