@@ -51,6 +51,9 @@ FULL_SCAN_THRESHOLD_KB = 10   # rule 2: only USE the map if a segment is bigger 
 TOP_K = 5              # every comparison looks at the top-5 results
 EF_VALUES = [16, 64, 128]   # Part 3: HNSW search-time shortlist sizes to try
 
+# --- Part 4: our own IVF index -------------------------------------------
+IVF_N_CLUSTERS = 40    # "a few dozen" clusters: ~150 posts each on average
+
 # --- Latency measurement -------------------------------------------------
 WARMUP_RUNS = 2        # searches run first and NOT timed (connection setup, caches)
 LATENCY_REPEATS = 20   # timed searches per query; we keep the median
