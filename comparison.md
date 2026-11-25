@@ -162,3 +162,68 @@ cluster means more posts to score, so it costs more time. At nprobe = 40 we are 
 checking every post, and the speed advantage is gone. The goal is to pick the smallest
 nprobe that gives good-enough accuracy. For our 6000 posts and 5 queries, nprobe = 8
 found every true top-5 post while scanning only about 21% of the posts.
+
+## Part 5: Combined comparison
+
+Every method, averaged over the 5 test queries. Ground truth is exact (brute-force)
+Cosine search. Overlap@5 = share of the true top 5 that a method also found (order
+ignored). Latency = median of 20 timed searches per query after 2 warm-up searches.
+
+| Method | Build settings | Search setting | Runs in | Avg overlap@5 | Avg latency (ms) |
+| --- | --- | --- | --- | --- | --- |
+| Exact (brute force) | none | checks all 6000 | Qdrant | 1.00 | 1.885 |
+| HNSW default | m=16, ef_construct=100 | ef=16 | Qdrant | 1.00 | 1.605 |
+| HNSW default | m=16, ef_construct=100 | ef=64 | Qdrant | 1.00 | 1.650 |
+| HNSW default | m=16, ef_construct=100 | ef=128 | Qdrant | 1.00 | 1.725 |
+| HNSW weak | m=4, ef_construct=8 | ef=16 | Qdrant | **0.60** | 1.641 |
+| HNSW weak | m=4, ef_construct=8 | ef=64 | Qdrant | **0.88** | 1.662 |
+| HNSW weak | m=4, ef_construct=8 | ef=128 | Qdrant | **0.88** | 1.632 |
+| IVF (our own) | 40 KMeans clusters | nprobe=1 | Python (numpy) | **0.84** | 0.026 |
+| IVF (our own) | 40 KMeans clusters | nprobe=8 | Python (numpy) | 1.00 | 0.115 |
+
+**Latency is not apples-to-apples.** Every Qdrant search includes an HTTP round trip of
+about 1.2 ms between Python and the Qdrant container. IVF runs inside Python with no round
+trip, so its latency cannot be compared directly with the Qdrant rows. Compare latencies
+within the same "Runs in" group. As a sanity check, IVF with nprobe = 40 (all clusters)
+gave overlap 1.00, as it must, because it scores every post (1.129 ms).
+
+### Speed/accuracy trade-off
+
+IVF got closest to exact search as it was given more work. With nprobe = 1 it found 84%
+of the true top 5, and with nprobe = 8 it found all of them (1.00) while scanning only
+about 21% of the posts. The weak HNSW map also improved with a bigger ef (0.60 at ef = 16,
+0.88 at ef = 64), but then it stopped improving: ef = 128 still gave 0.88. The default
+HNSW map was already exact at ef = 16, so a bigger ef only added time (1.605 → 1.725 ms).
+
+The reason is how each method uses the extra work. A bigger nprobe means more clusters
+are scored, so the set of candidate posts only grows, and at nprobe = 40 it contains every
+post. IVF is therefore guaranteed to reach exact search if it is given enough work. A
+bigger ef gives HNSW a longer shortlist, but the search can only move along the links of
+the map. The weak map (m = 4, ef_construct = 8) has too few, carelessly chosen links, so
+some true neighbours cannot be reached at any ef. m and ef_construct are build-time
+settings, so the real fix is to rebuild the map with higher values, not to raise ef.
+
+This matches the speed/accuracy trade-off: an index is fast because it skips most of the
+data, and it is accurate only when the posts it skips are not the true neighbours. Doing
+more work (checking more candidates) makes it more likely that the true neighbours are
+included, but it costs more time. For IVF, going from nprobe = 1 to 8 cost about 4 times
+the time (0.026 → 0.115 ms) for +0.16 overlap. The right setting is the smallest amount of
+work that gives good-enough accuracy.
+
+### Metric choice and index choice are separate decisions
+
+The distance metric decides **what** "closest" means. Cosine compares only the angle,
+Euclidean measures the straight-line distance, and Dot product is angle × length, so a
+long vector can win despite a worse angle. The index decides **how** we search for those
+closest posts: HNSW walks a layered map of neighbours, and IVF scores only the posts in
+the nearest clusters. So the metric decides which answer is correct, and the index
+decides how fast, and how reliably, we find it.
+
+Part 2 shows this. For the query "any plans for new space exploration by a space agency",
+the dataset and the index were the same in all three collections: none of them built an
+HNSW map, so all three searched every post exactly. Only the metric differed, and the
+ranking still changed. Cosine's #1 was post 4756, but Dot's #1 was post 2172, and Dot
+ranked a baseball post (5105) at #3. Its angle to the query is poor (cosine 0.391), but its
+vector is long (3.80, against an average of 2.35). Parts 3 and 4 did the opposite: the
+metric stayed Cosine and only the index changed. That changed how often we found the true
+top 5, but not what the true top 5 was.
