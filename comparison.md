@@ -68,13 +68,13 @@ searches, averaged over the 5 queries (full results:
 
 | Config | Map (build settings) | ef | Avg overlap@5 | Avg latency (ms) |
 | --- | --- | --- | --- | --- |
-| exact | none (checks all 6000) | – | 1.00 | 1.94 |
-| default_ef16 | m=16, ef_construct=100 | 16 | 1.00 | 1.64 |
-| default_ef64 | m=16, ef_construct=100 | 64 | 1.00 | 1.68 |
-| default_ef128 | m=16, ef_construct=100 | 128 | 1.00 | 1.82 |
-| weak_ef16 | m=4, ef_construct=8 | 16 | **0.60** | 1.61 |
-| weak_ef64 | m=4, ef_construct=8 | 64 | **0.88** | 1.63 |
-| weak_ef128 | m=4, ef_construct=8 | 128 | **0.88** | 1.66 |
+| exact | none (checks all 6000) | – | 1.00 | 1.89 |
+| default_ef16 | m=16, ef_construct=100 | 16 | 1.00 | 1.60 |
+| default_ef64 | m=16, ef_construct=100 | 64 | 1.00 | 1.65 |
+| default_ef128 | m=16, ef_construct=100 | 128 | 1.00 | 1.73 |
+| weak_ef16 | m=4, ef_construct=8 | 16 | **0.60** | 1.64 |
+| weak_ef64 | m=4, ef_construct=8 | 64 | **0.88** | 1.66 |
+| weak_ef128 | m=4, ef_construct=8 | 128 | **0.88** | 1.63 |
 
 **Default map, accuracy.** With the default settings (m=16, ef_construct=100), HNSW
 found 5 of the true top 5 for every query, even at the smallest ef we tried (16). With
@@ -91,13 +91,13 @@ build-time settings. A bigger ef helps a bad map only partly (0.60 → 0.88, nev
 The real fix is to rebuild the collection with a higher m (more neighbours per post) and
 a higher ef_construct (neighbours chosen more carefully).
 
-**Speed.** HNSW was only about 15% faster than exact search (1.64 vs 1.94 ms). Every
+**Speed.** HNSW was only about 15% faster than exact search (1.60 vs 1.89 ms). Every
 search includes a round trip between Python and Qdrant, which costs about 1.2 ms on its
 own (measured with a request that does no search). Without it, HNSW does roughly 40%
-less work (about 0.44 vs 0.74 ms), but with only 6000 posts the actual search work is
+less work (about 0.40 vs 0.69 ms), but with only 6000 posts the actual search work is
 small, so the round trip hides most of the difference. With millions of posts, exact
 search would slow down dramatically while HNSW would stay fast. For the default map, a
-bigger ef only costs time (1.64 → 1.82 ms), because accuracy is already 1.00.
+bigger ef only costs time (1.60 → 1.73 ms), because accuracy is already 1.00.
 Run-to-run differences of a few hundredths of a millisecond are noise.
 
 **Trap we had to avoid: Qdrant skips HNSW for small collections.** Qdrant has two
@@ -117,8 +117,8 @@ results: [results/ivf.json](results/ivf.json)).
 | Config | Clusters searched | Avg posts scanned | Avg overlap@5 | Avg latency (ms) |
 | --- | --- | --- | --- | --- |
 | ivf_nprobe1 | 1 of 40 | 136 | **0.84** | 0.026 |
-| ivf_nprobe8 | 8 of 40 | 1271 | 1.00 | 0.118 |
-| ivf_nprobe40 | 40 of 40 (= exact) | 6000 | 1.00 | 1.062 |
+| ivf_nprobe8 | 8 of 40 | 1271 | 1.00 | 0.115 |
+| ivf_nprobe40 | 40 of 40 (= exact) | 6000 | 1.00 | 1.129 |
 
 Per-query overlap at nprobe = 1: q1 1.0, q2 0.8, q3 1.0, q4 **0.4**, q5 1.0.
 
@@ -149,8 +149,8 @@ found it.
 
 **Speed.** Qdrant has no built-in IVF index, so we wrote ours with numpy and
 scikit-learn. Its latency grows with the number of posts it scores: 136 posts at
-nprobe = 1 took 0.026 ms, 1271 posts at nprobe = 8 took 0.118 ms, and all 6000 at
-nprobe = 40 took 1.06 ms. So the real speed-up comes from scanning fewer posts: nprobe = 1
+nprobe = 1 took 0.026 ms, 1271 posts at nprobe = 8 took 0.115 ms, and all 6000 at
+nprobe = 40 took 1.13 ms. So the real speed-up comes from scanning fewer posts: nprobe = 1
 was about 40 times faster than a full scan. IVF also looks faster than Qdrant's HNSW
 (about 1.6 ms), but that comparison is not fair: our IVF runs inside Python, while every
 Qdrant search includes an HTTP round trip of about 1.2 ms. How well IVF works in a real
