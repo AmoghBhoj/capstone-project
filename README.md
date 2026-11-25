@@ -129,3 +129,23 @@ then searches both collections with `ef` = 16, 64 and 128. For each configuratio
 records the top-5 overlap with exact search and the median latency (2 warm-up searches,
 then 20 timed ones per query). Latencies vary slightly from run to run. The results
 table and findings are in `comparison.md`.
+
+## Part 4: Custom IVF index
+
+Qdrant only offers HNSW, so `ivf.py` implements a simple IVF index with KMeans and numpy:
+
+- `build_ivf_index()` groups the 6000 **normalised** post vectors into 40 clusters
+  (KMeans, seed 42) and remembers which posts are in each cluster.
+- `search_ivf()` finds the `nprobe` cluster centres closest to the query, scores only
+  the posts in those clusters (cosine), and returns the top 5 plus how many posts it scored.
+
+```bash
+python ivf.py       # optional preview: cluster sizes, top topics, one test search
+python compare.py   # also runs IVF at nprobe 1, 8 and 40 -> results/ivf.json
+```
+
+`compare.py` uses the same ground truth (Qdrant exact search) and the same overlap@5 and
+latency method as Part 3. nprobe = 40 searches every cluster, so it must match exact
+search: it is a sanity check. IVF search runs inside Python, with no HTTP round trip,
+so its latency is not directly comparable with Qdrant's. `compare.py` still needs Qdrant
+running for the ground truth.

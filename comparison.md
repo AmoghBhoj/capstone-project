@@ -106,3 +106,59 @@ per-segment rules: `indexing_threshold` decides whether the HNSW map is **built*
 collections have 2 segments of about 4.5 MB each, below both defaults, so without
 lowering both (to 100 KB and 10 KB), every "HNSW" search would really have been an
 exact search, showing 100% overlap even for the weak map.
+
+## Part 4: Custom IVF index (KMeans + nprobe)
+
+Our own IVF index (`ivf.py`, numpy and scikit-learn only, no Qdrant) groups the 6000
+**normalised** post vectors into 40 clusters with KMeans (seed 42), about 150 posts per
+cluster. Ground truth, overlap@5 and latency are measured exactly as in Part 3 (full
+results: [results/ivf.json](results/ivf.json)).
+
+| Config | Clusters searched | Avg posts scanned | Avg overlap@5 | Avg latency (ms) |
+| --- | --- | --- | --- | --- |
+| ivf_nprobe1 | 1 of 40 | 136 | **0.84** | 0.026 |
+| ivf_nprobe8 | 8 of 40 | 1271 | 1.00 | 0.118 |
+| ivf_nprobe40 | 40 of 40 (= exact) | 6000 | 1.00 | 1.062 |
+
+Per-query overlap at nprobe = 1: q1 1.0, q2 0.8, q3 1.0, q4 **0.4**, q5 1.0.
+
+**What IVF does.** Instead of comparing the query with all 6000 posts, IVF divides the
+posts into clusters once, ahead of time. Each cluster has a centroid: the average of all
+the vectors in it. When a query comes in, IVF first compares it only with the 40
+centroids (Euclidean distance, the same rule KMeans used to build the clusters), keeps
+the nprobe closest clusters, and then scores only the posts inside those clusters.
+
+**Accuracy.** With nprobe = 1, IVF searches only one cluster and ignores every post
+outside it, even posts that would have scored higher. Because the clusters follow topics
+well, this was often enough: 3 of 5 queries still found all of the true top 5 (average
+0.84). It fails when a true neighbour sits just across a cluster boundary (queries 2 and
+4). With nprobe = 8 (about 20% of the posts), all 5 queries found 5 of 5, but that is not
+guaranteed: a true neighbour could sit in the 9th-closest cluster. A larger nprobe can
+never do worse than a smaller one, because it scores every post the smaller one scored,
+plus more. nprobe = 40 searches every cluster, so it scores every post and is exact
+search. It is our sanity check.
+
+**Why nprobe = 1 misses: query 4 (Adam and Eve).** IVF first ranks the clusters by the
+Euclidean distance between the query and each centroid. For query 4, the two closest
+clusters are almost tied: cluster 20 at 0.958 and cluster 0 at 0.966. nprobe = 1
+searched only cluster 20, so it never scored post 3495 (the true #1, score 0.647) or post
+3754, both in cluster 0. This happens because the religion newsgroups (christian, atheism,
+religion.misc) discuss the same subjects, so their posts are spread over several
+neighbouring clusters. Post 715 sits in the 8th-closest cluster, so nprobe = 8 only just
+found it.
+
+**Speed.** Qdrant has no built-in IVF index, so we wrote ours with numpy and
+scikit-learn. Its latency grows with the number of posts it scores: 136 posts at
+nprobe = 1 took 0.026 ms, 1271 posts at nprobe = 8 took 0.118 ms, and all 6000 at
+nprobe = 40 took 1.06 ms. So the real speed-up comes from scanning fewer posts: nprobe = 1
+was about 40 times faster than a full scan. IVF also looks faster than Qdrant's HNSW
+(about 1.6 ms), but that comparison is not fair: our IVF runs inside Python, while every
+Qdrant search includes an HTTP round trip of about 1.2 ms. How well IVF works in a real
+system also depends on the data: how cleanly it splits into clusters and how many
+vectors there are.
+
+**Trade-off.** Raising nprobe brings the results closer to exact search, but each extra
+cluster means more posts to score, so it costs more time. At nprobe = 40 we are back to
+checking every post, and the speed advantage is gone. The goal is to pick the smallest
+nprobe that gives good-enough accuracy. For our 6000 posts and 5 queries, nprobe = 8
+found every true top-5 post while scanning only about 21% of the posts.
