@@ -24,6 +24,7 @@ ranks post 5105 at #3, which belongs to `rec.sport.baseball`, a topic unrelated 
 query. Cosine doesn't have it in its top 5 at all.
 
 **What each metric measures.**
+
 - **Cosine** measures the **angle only**, so a vector's length doesn't matter.
 - **Euclidean** measures the **straight-line distance** between the two vectors' tips,
   so it is affected by both the angle and the difference in length. Lower = closer.
@@ -55,3 +56,53 @@ slip through. Post 207 (cosine #2) contains quoted text from another person that
 removed, because those lines start with a space before the `>`. Its most query-relevant
 words ("Manned Lunar Exploration") come from that quoted text, so it ranks high partly
 because of someone else's words.
+
+## Part 3: HNSW vs exact search
+
+Two Cosine collections hold the same raw vectors and differ only in how the HNSW map
+is built. Ground truth is exact (brute-force) search on `news_hnsw_default`, which
+checks all 6000 posts. Overlap@5 = how many of the true top 5 a configuration also
+found (order ignored). Latency = median of 20 timed searches per query after 2 warm-up
+searches, averaged over the 5 queries (full results:
+[results/hnsw.json](results/hnsw.json)).
+
+| Config | Map (build settings) | ef | Avg overlap@5 | Avg latency (ms) |
+| --- | --- | --- | --- | --- |
+| exact | none (checks all 6000) | – | 1.00 | 1.94 |
+| default_ef16 | m=16, ef_construct=100 | 16 | 1.00 | 1.64 |
+| default_ef64 | m=16, ef_construct=100 | 64 | 1.00 | 1.68 |
+| default_ef128 | m=16, ef_construct=100 | 128 | 1.00 | 1.82 |
+| weak_ef16 | m=4, ef_construct=8 | 16 | **0.60** | 1.61 |
+| weak_ef64 | m=4, ef_construct=8 | 64 | **0.88** | 1.63 |
+| weak_ef128 | m=4, ef_construct=8 | 128 | **0.88** | 1.66 |
+
+**Default map, accuracy.** With the default settings (m=16, ef_construct=100), HNSW
+found 5 of the true top 5 for every query, even at the smallest ef we tried (16). With
+only 6000 posts and a good map, HNSW is as accurate as exact search.
+
+**Weak map, accuracy.** With the weak settings (m=4, ef_construct=8), accuracy dropped
+to 0.60 at ef=16, because each post has very few, carelessly chosen neighbours. For
+query 1 it found 0 of the true top 5. Raising ef to 64 improved it to 0.88, but ef=128
+gave no further benefit: with so few connections, the search runs out of new posts to
+reach, so a bigger shortlist has nothing to add.
+
+**What fixes a weak map.** ef is a search-time setting, while m and ef_construct are
+build-time settings. A bigger ef helps a bad map only partly (0.60 → 0.88, never 1.00).
+The real fix is to rebuild the collection with a higher m (more neighbours per post) and
+a higher ef_construct (neighbours chosen more carefully).
+
+**Speed.** HNSW was only about 15% faster than exact search (1.64 vs 1.94 ms). Every
+search includes a round trip between Python and Qdrant, which costs about 1.2 ms on its
+own (measured with a request that does no search). Without it, HNSW does roughly 40%
+less work (about 0.44 vs 0.74 ms), but with only 6000 posts the actual search work is
+small, so the round trip hides most of the difference. With millions of posts, exact
+search would slow down dramatically while HNSW would stay fast. For the default map, a
+bigger ef only costs time (1.64 → 1.82 ms), because accuracy is already 1.00.
+Run-to-run differences of a few hundredths of a millisecond are noise.
+
+**Trap we had to avoid: Qdrant skips HNSW for small collections.** Qdrant has two
+per-segment rules: `indexing_threshold` decides whether the HNSW map is **built**, and
+`full_scan_threshold` decides whether it is **used**. Both default to 10 MB. Our
+collections have 2 segments of about 4.5 MB each, below both defaults, so without
+lowering both (to 100 KB and 10 KB), every "HNSW" search would really have been an
+exact search, showing 100% overlap even for the weak map.

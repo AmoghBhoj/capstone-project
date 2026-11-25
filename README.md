@@ -102,3 +102,30 @@ side, flags queries where the **ranking order** differs, and saves everything to
 
 If you edit `queries.md`, run `python embed.py` again before `compare.py`, so the
 query vectors match the new text.
+
+## Part 3: HNSW vs exact search
+
+Uses the same two commands as Part 2: `qdrant_setup.py` also creates the HNSW
+collections, and `compare.py` also runs the HNSW comparison.
+
+```bash
+python qdrant_setup.py   # also creates news_hnsw_default + news_hnsw_weak (~15 s)
+python compare.py        # also measures overlap@5 and latency -> results/hnsw.json
+```
+
+`qdrant_setup.py` creates two Cosine collections with the same raw vectors:
+
+| Collection | HNSW build settings |
+| --- | --- |
+| `news_hnsw_default` | Qdrant defaults: `m=16`, `ef_construct=100` |
+| `news_hnsw_weak` | deliberately weak: `m=4`, `ef_construct=8` |
+
+Both lower `indexing_threshold` (100 KB) and `full_scan_threshold` (10 KB). Otherwise
+Qdrant would skip HNSW for a collection this small and quietly do exact search. The
+script waits until each HNSW map is fully built and prints `indexed=6000/6000`.
+
+`compare.py` uses exact search (`exact=True`) on `news_hnsw_default` as ground truth,
+then searches both collections with `ef` = 16, 64 and 128. For each configuration it
+records the top-5 overlap with exact search and the median latency (2 warm-up searches,
+then 20 timed ones per query). Latencies vary slightly from run to run. The results
+table and findings are in `comparison.md`.
